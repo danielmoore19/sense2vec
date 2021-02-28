@@ -2,11 +2,10 @@ from typing import Tuple, List, Union, Sequence, Dict, Callable, Any
 from pathlib import Path
 from spacy.vectors import Vectors
 from spacy.strings import StringStore
-from spacy.util import SimpleFrozenDict
 import numpy
 import srsly
 
-from .util import registry, cosine_similarity
+from .util import registry, cosine_similarity, SimpleFrozenDict
 
 
 class Sense2Vec(object):

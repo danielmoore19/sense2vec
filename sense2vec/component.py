@@ -1,17 +1,16 @@
-from typing import Tuple, Union, List, Dict, Callable, Iterable, Optional
-from spacy.language import Language
+from typing import Tuple, Union, List, Dict
+from spacy import component
 from spacy.tokens import Doc, Token, Span
-from spacy.training import Example
 from spacy.vocab import Vocab
-from spacy.util import SimpleFrozenDict
+from spacy.language import Language
 from pathlib import Path
 import numpy
 
 from .sense2vec import Sense2Vec
-from .util import registry
+from .util import registry, SimpleFrozenDict
 
 
-@Language.factory(
+@component(
     "sense2vec",
     requires=["token.pos", "token.dep", "token.ent_type", "token.ent_iob", "doc.ents"],
     assigns=[
@@ -33,23 +32,6 @@ from .util import registry
         "span._.s2v_similarity",
     ],
 )
-def make_sense2vec(
-    nlp: Language,
-    name: str,
-    shape: Tuple[int, int] = (100, 128),
-    merge_phrases: bool = False,
-    lemmatize: bool = False,
-    overrides: Dict[str, str] = SimpleFrozenDict(),
-):
-    return Sense2VecComponent(
-        nlp.vocab,
-        shape=shape,
-        merge_phrases=merge_phrases,
-        lemmatize=lemmatize,
-        overrides=overrides,
-    )
-
-
 class Sense2VecComponent(object):
     def __init__(
         self,
@@ -214,25 +196,7 @@ class Sense2VecComponent(object):
         RETURNS (list): A list of other senses.
         """
         key = self.s2v_key(obj)
-        return obj.doc._._s2v.get_other_senses(key)
-
-    def initialize(
-        self,
-        get_examples: Callable[[], Iterable[Example]],
-        *,
-        nlp: Optional[Language] = None,
-        data_path: Optional[str] = None
-    ):
-        """Initialize the component and load in data. Can be used to add the
-        component with vectors to a pipeline before training.
-
-        get_examples (Callable[[], Iterable[Example]]): Function that
-            returns a representative sample of gold-standard Example objects.
-        nlp (Language): The current nlp object the component is part of.
-        data_path (Optional[str]): Optional path to sense2vec model.
-        """
-        if data_path is not None:
-            self.from_disk(data_path)
+        return obj._._s2v.get_other_senses(key)
 
     def to_bytes(self) -> bytes:
         """Serialize the component to a bytestring.

@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 import spacy
 from spacy.tokens import DocBin
+import plac
 from wasabi import msg
 from pathlib import Path
 import tqdm
-import typer
 
 
-def main(
-    # fmt: off
-    in_file: str = typer.Argument(..., help="Path to input file"),
-    out_dir: str = typer.Argument(..., help="Path to output directory"),
-    spacy_model: str = typer.Argument("en_core_web_sm", help="Name of spaCy model to use"),
-    n_process: int = typer.Option(1, "--n-process", "-n", help="Number of processes (multiprocessing)"),
-    max_docs: int = typer.Option(10 ** 6, "--max-docs", "-m", help="Maximum docs per batch"),
-    # fmt: on
-):
+@plac.annotations(
+    in_file=("Path to input file", "positional", None, str),
+    out_dir=("Path to output directory", "positional", None, str),
+    spacy_model=("Name of spaCy model to use", "positional", None, str),
+    n_process=("Number of processes (multiprocessing)", "option", "n", int),
+    max_docs=("Maximum docs per batch",  "option", "m", int),
+)
+def main(in_file, out_dir, spacy_model="en_core_web_sm", n_process=1, max_docs=10**6):
     """
     Step 1: Parse raw text with spaCy
 
@@ -41,6 +40,7 @@ def main(
             if count < max_docs:
                 doc_bin.add(doc)
                 count += 1
+                output_file = output_path / f"{input_path.stem}.spacy"
             else:
                 batch_num += 1
                 count = 0
@@ -56,10 +56,7 @@ def main(
             output_file = output_path / f"{input_path.stem}-{batch_num}.spacy"
             doc_bin_bytes = doc_bin.to_bytes()
             f.write(doc_bin_bytes)
-            msg.good(
-                f"Complete. Saved final parsed docs to file", output_file.resolve()
-            )
-
+            msg.good(f"Complete. Saved final parsed docs to file", output_file.resolve())
 
 if __name__ == "__main__":
-    typer.run(main)
+    plac.call(main)
