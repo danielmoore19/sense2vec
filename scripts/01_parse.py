@@ -13,7 +13,7 @@ def main(
     out_dir: str = typer.Argument(..., help="Path to output directory"),
     spacy_model: str = typer.Argument("en_core_web_sm", help="Name of spaCy model to use"),
     n_process: int = typer.Option(1, "--n-process", "-n", help="Number of processes (multiprocessing)"),
-    max_docs: int = typer.Option(10 ** 6, "--max-docs", "-m", help="Maximum docs per batch"),
+    max_docs: int = typer.Option(10**6, "--max-docs", "-m", help="Maximum docs per batch"),
     # fmt: on
 ):
     """
