@@ -14,7 +14,7 @@ import tqdm
     n_process=("Number of processes (multiprocessing)", "option", "n", int),
     max_docs=("Maximum docs per batch",  "option", "m", int),
 )
-def main(in_file, out_dir, spacy_model="en_core_web_sm", n_process=1, max_docs=10**6):
+def main(in_file, out_dir, spacy_model="en_core_web_lg", n_process=1, max_docs=10**6):
     """
     Step 1: Parse raw text with spaCy
 
